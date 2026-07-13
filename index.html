@@ -394,5 +394,133 @@
 
       form.addEventListener('submit', calculateDepreciation);
     </script>
+    <!-- ====== ESTILOS CORPORATIVOS ====== -->
+<style>
+  .corporate-box {
+    border: 2px solid #003366;
+    padding: 20px;
+    border-radius: 10px;
+    background: #ffffff;
+    margin-top: 20px;
+  }
+  .corporate-title {
+    font-family: 'Roboto', sans-serif;
+    color: #003366;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  #tablaResultados {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  #tablaResultados th, #tablaResultados td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+  }
+  #tablaResultados th {
+    background: #003366;
+    color: white;
+  }
+</style>
+
+<!-- ====== CONTENEDOR CORPORATIVO ====== -->
+<div class="corporate-box">
+  <div class="corporate-title">Reporte Corporativo Ross‑Heidecke</div>
+
+  <canvas id="graficoDepreciacion" height="120"></canvas>
+  <canvas id="graficoResidual" height="120" style="margin-top:20px;"></canvas>
+
+  <table id="tablaResultados"></table>
+
+  <button onclick="generarPDF()" 
+          style="margin-top:20px; padding:10px 20px; background:#003366; color:white; border:none; border-radius:5px;">
+    Generar PDF Corporativo
+  </button>
+</div>
+
+<!-- ====== LIBRERÍAS ====== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+<!-- ====== LÓGICA CORPORATIVA ====== -->
+<script>
+function generarReporteCorporativo(datos) {
+  // datos = { años:[], depreciacion:[], residual:[], tabla:[...] }
+
+  // ====== GRÁFICO DE DEPRECIACIÓN ======
+  new Chart(document.getElementById("graficoDepreciacion"), {
+    type: "bar",
+    data: {
+      labels: datos.años,
+      datasets: [{
+        label: "Depreciación anual",
+        data: datos.depreciacion,
+        backgroundColor: "#003366"
+      }]
+    }
+  });
+
+  // ====== GRÁFICO DE RESIDUAL ======
+  new Chart(document.getElementById("graficoResidual"), {
+    type: "line",
+    data: {
+      labels: datos.años,
+      datasets: [{
+        label: "Valor residual",
+        data: datos.residual,
+        borderColor: "#0099cc",
+        backgroundColor: "rgba(0,153,204,0.2)"
+      }]
+    }
+  });
+
+  // ====== TABLA ======
+  let tabla = document.getElementById("tablaResultados");
+  tabla.innerHTML = `
+    <tr>
+      <th>Año</th>
+      <th>Valor Inicial</th>
+      <th>Depreciación</th>
+      <th>Valor Residual</th>
+    </tr>
+  `;
+  datos.tabla.forEach(r => {
+    tabla.innerHTML += `
+      <tr>
+        <td>${r.anio}</td>
+        <td>${r.inicial}</td>
+        <td>${r.dep}</td>
+        <td>${r.residual}</td>
+      </tr>
+    `;
+  });
+}
+
+function generarPDF() {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+
+  pdf.setFont("Helvetica", "bold");
+  pdf.setFontSize(18);
+  pdf.text("Reporte Corporativo Ross-Heidecke", 14, 20);
+
+  pdf.setFontSize(12);
+  pdf.text("Depreciación y Valor Residual", 14, 30);
+
+  // ====== TABLA ======
+  pdf.autoTable({
+    html: "#tablaResultados",
+    startY: 40,
+    styles: { halign: "center" },
+    headStyles: { fillColor: [0, 51, 102] }
+  });
+
+  pdf.save("Reporte_Ross_Heidecke.pdf");
+}
+</script>
   </body>
-</html>
+  </html>
