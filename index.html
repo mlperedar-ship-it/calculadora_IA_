@@ -285,6 +285,79 @@
         </section>
 
         <section class="results" aria-live="polite">
+          <!-- ========================= -->
+<!-- BLOQUE CORPORATIVO        -->
+<!-- ========================= -->
+
+<div class="card" style="margin-top: 30px; border-radius: 22px; padding: 24px;">
+  <h2 style="margin-top:0;">Reporte Corporativo del Modelo IA</h2>
+  <p style="color:#4f6b8a;">Visualización ejecutiva del cálculo Ross‑Heidecke.</p>
+
+  <!-- Tabla corporativa -->
+  <h3 style="margin-top:20px;">Tabla de resultados</h3>
+  <table class="table table-bordered" style="width:100%; border-collapse:collapse;">
+    <thead style="background:#e9eef4;">
+      <tr>
+        <th>Métrica</th>
+        <th>Valor</th>
+        <th>Interpretación</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>VRN</td>
+        <td id="corpVRN">—</td>
+        <td>Valor base del inmueble.</td>
+      </tr>
+      <tr>
+        <td>Edad</td>
+        <td id="corpEdad">—</td>
+        <td>Años transcurridos.</td>
+      </tr>
+      <tr>
+        <td>Vida útil</td>
+        <td id="corpVida">—</td>
+        <td>Referencia técnica.</td>
+      </tr>
+      <tr>
+        <td>Factor Ross (R)</td>
+        <td id="corpRoss">—</td>
+        <td>Componente técnico.</td>
+      </tr>
+      <tr>
+        <td>Coef. Heidecke (p)</td>
+        <td id="corpHeidecke">—</td>
+        <td>Estado de conservación.</td>
+      </tr>
+      <tr>
+        <td>Factor total</td>
+        <td id="corpTotal">—</td>
+        <td>Ross + Heidecke.</td>
+      </tr>
+      <tr>
+        <td>Depreciación acumulada</td>
+        <td id="corpDep">—</td>
+        <td>Valor depreciado.</td>
+      </tr>
+      <tr>
+        <td>Valor actual neto</td>
+        <td id="corpValorActual">—</td>
+        <td>Resultado final.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Gráfico -->
+  <h3 style="margin-top:30px;">Gráfico corporativo</h3>
+  <canvas id="graficoCorp" height="120"></canvas>
+
+  <!-- Botón PDF -->
+  <button onclick="window.print()" 
+          style="margin-top:20px; padding:12px 18px; border-radius:999px; background:#1b4f7a; color:white; font-weight:700;">
+    Exportar reporte a PDF
+  </button>
+</div>
+
           <h2>Resultado de la depreciación</h2>
           <p>Los valores se actualizan automáticamente tras validar los datos.</p>
 
@@ -394,5 +467,44 @@
 
       form.addEventListener('submit', calculateDepreciation);
     </script>
+    <!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+function actualizarReporteCorporativo(vrn, edad, vida, R, p, F_total, depreciacionAcumulada, valorActualNeto) {
+
+  // Actualizar tabla corporativa
+  document.getElementById('corpVRN').textContent = vrn.toLocaleString('es-MX');
+  document.getElementById('corpEdad').textContent = edad;
+  document.getElementById('corpVida').textContent = vida;
+  document.getElementById('corpRoss').textContent = R.toFixed(4);
+  document.getElementById('corpHeidecke').textContent = p.toFixed(4);
+  document.getElementById('corpTotal').textContent = F_total.toFixed(4);
+  document.getElementById('corpDep').textContent = formatCurrency(depreciacionAcumulada);
+  document.getElementById('corpValorActual').textContent = formatCurrency(valorActualNeto);
+
+  // Gráfico corporativo
+  const ctx = document.getElementById('graficoCorp').getContext('2d');
+
+  if (window.graficoCorp) window.graficoCorp.destroy();
+
+  window.graficoCorp = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['VRN', 'Depreciación', 'Valor Actual'],
+      datasets: [{
+        label: 'Resultados del modelo IA',
+        data: [vrn, depreciacionAcumulada, valorActualNeto],
+        backgroundColor: ['#0f2344', '#c74b4b', '#2e7d32']
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
+</script>
+
   </body>
   </html>
